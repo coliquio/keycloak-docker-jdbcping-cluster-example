@@ -1,11 +1,6 @@
 # Keycloak Cluster based on Docker + JDBC_PING
 
-Note: this demonstrates issues creating session on keycloak cluster
-
-Related discussions:
-
-- https://issues.jboss.org/browse/KEYCLOAK-9855
-- http://lists.jboss.org/pipermail/keycloak-user/2019-March/017511.html
+Note: this demonstrates issues persisting sessions using Keycloak Infinispan JDBC Store
 
 ## Start the cluster
 
@@ -19,7 +14,7 @@ docker-compose down && docker-compose -f docker-compose.yml -f docker-compose.po
 
 ## Create Sessions
 
-### Cluster (this fails and demonstrates the issue)
+### Cluster
 
 ```bash
 open http://localhost:8000/auth/realms/example/account
