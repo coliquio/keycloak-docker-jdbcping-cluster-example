@@ -40,6 +40,20 @@ open http://localhost:8081/auth/realms/example/account
 
 ## Analyse Internals
 
+### JDBC Sessions
+
+No client sessions (does not match expectations because user just logged in)
+
+```bash
+mysql --host 127.0.0.1 --user root --password=root --database keycloak --execute "select * from ISPN_clientSessions;"
+```
+
+No sessions (does not match expectations because user just logged in)
+
+```bash
+mysql --host 127.0.0.1 --user root --password=root --database keycloak --execute "select * from ISPN_sessions;"
+```
+
 ### Container Logs
 
 ```bash
