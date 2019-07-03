@@ -59,6 +59,8 @@ No sessions (does not match expectations because user just logged in)
 mysql --host 127.0.0.1 --user root --password=root --database keycloak --execute "select * from ISPN_sessions;"
 ```
 
+Interestingly for the tables `ISPN_authenticationSessions` or `ISPN_actionTokens` the persistence works immediately (e.g. after opening a new login page without being logged in)!
+
 ### Container Logs
 
 ```bash
