@@ -21,10 +21,6 @@ open http://localhost:8000/auth/realms/example/account
 
 # Username `user`
 # Password `password`
-
-# => fails with the following error on the UI:
-# 1st try (or cleared cookies) => "An error occurred, please login again through your application."
-# 2nd try (with existing cookies) => "You are already logged in."
 ```
 
 ### Single Node
@@ -37,6 +33,15 @@ open http://localhost:8081/auth/realms/example/account
 
 # => works, the "Edit Account" view is shown
 ```
+
+### Stopping/starting nodes and testing session aliveness
+
+1. Stop instance 1 `docker stop keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_1`
+2. Check in browser if you are still logged in -> works, because sessions are spread in cluster memory (CORRECT)
+3. Stop instance 2 `docker stop keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_2`
+4. Of course, now no web UI is available
+5. Start instance 1 again `docker start keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_1`
+6. Check in browser if you are still logged in -> works, because sessions were not persisted in mysql db (WRONG)
 
 ## Analyse Internals
 
