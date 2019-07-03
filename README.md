@@ -19,8 +19,8 @@ docker-compose down && docker-compose -f docker-compose.yml -f docker-compose.po
 ```bash
 open http://localhost:8000/auth/realms/example/account
 
-# Username `user`
-# Password `password`
+# Username `admin`
+# Password `admin`
 ```
 
 ### Single Node
@@ -28,8 +28,8 @@ open http://localhost:8000/auth/realms/example/account
 ```bash
 open http://localhost:8081/auth/realms/example/account
 
-# Username `user`
-# Password `password`
+# Username `admin`
+# Password `admin`
 
 # => works, the "Edit Account" view is shown
 ```
