@@ -1,24 +1,51 @@
 embed-server --server-config=standalone-ha.xml --std-out=echo
 batch
 
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:remove
-/subsystem=infinispan/cache-container=keycloak/replicated-cache=sessions:add()
-/subsystem=infinispan/cache-container=keycloak/replicated-cache=sessions:write-attribute(name="mode",value="SYNC")
+cd /subsystem=infinispan/cache-container=keycloak/
 
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions:remove
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions:add(mode="SYNC",owners=${env.CACHE_OWNERS:2})
+./distributed-cache=sessions:remove
+./distributed-cache=sessions:add()
+./distributed-cache=authenticationSessions:remove
+./distributed-cache=authenticationSessions:add()
+./distributed-cache=offlineSessions:remove
+./distributed-cache=offlineSessions:add()
+./distributed-cache=clientSessions:remove
+./distributed-cache=clientSessions:add()
+./distributed-cache=offlineClientSessions:remove
+./distributed-cache=offlineClientSessions:add()
+./distributed-cache=loginFailures:remove
+./distributed-cache=loginFailures:add()
+./distributed-cache=actionTokens:remove
+./distributed-cache=actionTokens:add()
 
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions:remove
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions:add(mode="SYNC",owners=${env.CACHE_OWNERS:2})
+./distributed-cache=sessions:write-attribute                                  (name=owners, value=${env.CACHE_OWNERS:2})
+./distributed-cache=authenticationSessions:write-attribute                    (name=owners, value=${env.CACHE_OWNERS:2})
+./distributed-cache=offlineSessions:write-attribute                           (name=owners, value=${env.CACHE_OWNERS:2})
+./distributed-cache=clientSessions:write-attribute                            (name=owners, value=${env.CACHE_OWNERS:2})
+./distributed-cache=offlineClientSessions:write-attribute                     (name=owners, value=${env.CACHE_OWNERS:2})
+./distributed-cache=loginFailures:write-attribute                             (name=owners, value=${env.CACHE_OWNERS:2})
+./distributed-cache=actionTokens:write-attribute                              (name=owners, value=${env.CACHE_OWNERS:2})
 
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:remove
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:add(mode="SYNC",owners=${env.CACHE_OWNERS:2})
+./distributed-cache=sessions/store=string-jdbc:add                            (data-source=KeycloakDS, preload=false, passivation=false, purge=false, shared=false, properties={key2StringMapper="de.coliquio.keycloak.ExtendedKeyMapper"})
+./distributed-cache=sessions/store=string-jdbc/table=string:add               (id-column={name="id", type="VARCHAR(255)"}, data-column={name="data", type="BLOB"},timestamp-column={name="timestamp", type="BIGINT"}, prefix="ISPN")
 
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions:remove
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions:add(mode="SYNC",owners=${env.CACHE_OWNERS:2})
+./distributed-cache=authenticationSessions/store=string-jdbc:add              (data-source=KeycloakDS, preload=false, passivation=false, purge=false, shared=false, properties={key2StringMapper="de.coliquio.keycloak.ExtendedKeyMapper"})
+./distributed-cache=authenticationSessions/store=string-jdbc/table=string:add (id-column={name="id", type="VARCHAR(255)"}, data-column={name="data", type="BLOB"},timestamp-column={name="timestamp", type="BIGINT"}, prefix="ISPN")
 
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures:remove
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures:add(mode="SYNC",owners=${env.CACHE_OWNERS:2})
+./distributed-cache=offlineSessions/store=string-jdbc:add                     (data-source=KeycloakDS, preload=false, passivation=false, purge=false, shared=false, properties={key2StringMapper="de.coliquio.keycloak.ExtendedKeyMapper"})
+./distributed-cache=offlineSessions/store=string-jdbc/table=string:add        (id-column={name="id", type="VARCHAR(255)"}, data-column={name="data", type="BLOB"},timestamp-column={name="timestamp", type="BIGINT"}, prefix="ISPN")
+
+./distributed-cache=clientSessions/store=string-jdbc:add                      (data-source=KeycloakDS, preload=false, passivation=false, purge=false, shared=false, properties={key2StringMapper="de.coliquio.keycloak.ExtendedKeyMapper"})
+./distributed-cache=clientSessions/store=string-jdbc/table=string:add         (id-column={name="id", type="VARCHAR(255)"}, data-column={name="data", type="BLOB"},timestamp-column={name="timestamp", type="BIGINT"}, prefix="ISPN")
+
+./distributed-cache=offlineClientSessions/store=string-jdbc:add               (data-source=KeycloakDS, preload=false, passivation=false, purge=false, shared=false, properties={key2StringMapper="de.coliquio.keycloak.ExtendedKeyMapper"})
+./distributed-cache=offlineClientSessions/store=string-jdbc/table=string:add  (id-column={name="id", type="VARCHAR(255)"}, data-column={name="data", type="BLOB"},timestamp-column={name="timestamp", type="BIGINT"}, prefix="ISPN")
+
+./distributed-cache=loginFailures/store=string-jdbc:add                       (data-source=KeycloakDS, preload=false, passivation=false, purge=false, shared=false, properties={key2StringMapper="de.coliquio.keycloak.ExtendedKeyMapper"})
+./distributed-cache=loginFailures/store=string-jdbc/table=string:add          (id-column={name="id", type="VARCHAR(255)"}, data-column={name="data", type="BLOB"},timestamp-column={name="timestamp", type="BIGINT"}, prefix="ISPN")
+
+./distributed-cache=actionTokens/store=string-jdbc:add                        (data-source=KeycloakDS, preload=false, passivation=false, purge=false, shared=false, properties={key2StringMapper="de.coliquio.keycloak.ExtendedKeyMapper"})
+./distributed-cache=actionTokens/store=string-jdbc/table=string:add           (id-column={name="id", type="VARCHAR(255)"}, data-column={name="data", type="BLOB"},timestamp-column={name="timestamp", type="BIGINT"}, prefix="ISPN")
 
 run-batch
 stop-embedded-server

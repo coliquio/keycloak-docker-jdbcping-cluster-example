@@ -1,13 +1,12 @@
 # Keycloak Cluster based on Docker + JDBC_PING
 
-Note: this demonstrates issues creating session on keycloak cluster
+Note: this demonstrates issues persisting sessions using Keycloak Infinispan JDBC Store
 
-Related discussions:
+## Sandbox Environment
 
-- https://issues.jboss.org/browse/KEYCLOAK-9855
-- http://lists.jboss.org/pipermail/keycloak-user/2019-March/017511.html
+Requirements: docker and docker-compose are installed
 
-## Start the cluster
+### Start the cluster
 
 ```bash
 # just start
@@ -17,33 +16,66 @@ docker-compose -f docker-compose.yml -f docker-compose.ports.yml up
 docker-compose down && docker-compose -f docker-compose.yml -f docker-compose.ports.yml up --build
 ```
 
-## Create Sessions
+### Create Sessions
 
-### Cluster (this fails and demonstrates the issue)
+#### Cluster
 
 ```bash
 open http://localhost:8000/auth/realms/example/account
 
-# Username `user`
-# Password `password`
-
-# => fails with the following error on the UI:
-# 1st try (or cleared cookies) => "An error occurred, please login again through your application."
-# 2nd try (with existing cookies) => "You are already logged in."
+# Username `admin`
+# Password `admin`
 ```
 
-### Single Node
+#### Single Node
 
 ```bash
 open http://localhost:8081/auth/realms/example/account
 
-# Username `user`
-# Password `password`
+# Username `admin`
+# Password `admin`
 
 # => works, the "Edit Account" view is shown
 ```
 
+### Problem
+
+#### Expectation
+
+Keycloak cluster nodes should persist all sessions in the JDBC mysql database, because the caches are configured like that [./startup-scripts/cache_owners.cli](./startup-scripts/cache_owners.cli)
+
+So after stopping and restarting all cluster nodes, the expectation is that Keycloak nodes get their sessions again from the mysql database.
+
+#### Observation
+
+After stopping all cluster nodes and restarting them, all sessions are gone.
+
+#### Steps to reproduce
+
+1. Stop instance 1 `docker stop keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_1`
+2. Check in browser if you are still logged in -> works, because sessions are spread in cluster memory (**CORRECT**)
+3. Stop instance 2 `docker stop keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_2`
+4. Of course, now no web UI is available
+5. Start instance 1 again `docker start keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_1` (wait some minute to until it comes up again)
+6. Check in browser if you are still logged in -> works, because sessions were not persisted in mysql db (**WRONG**)
+
 ## Analyse Internals
+
+### JDBC Sessions
+
+No client sessions (does not match expectations because user just logged in)
+
+```bash
+mysql --host 127.0.0.1 --user root --password=root --database keycloak --execute "select * from ISPN_clientSessions;"
+```
+
+No sessions (does not match expectations because user just logged in)
+
+```bash
+mysql --host 127.0.0.1 --user root --password=root --database keycloak --execute "select * from ISPN_sessions;"
+```
+
+Interestingly for the tables `ISPN_authenticationSessions` or `ISPN_actionTokens` the persistence works immediately (e.g. after opening a new login page without being logged in)!
 
 ### Container Logs
 

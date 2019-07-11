@@ -12,7 +12,11 @@ ENV KEYCLOAK_IMPORT /opt/jboss/realms/example.json
 # Add module
 COPY vendor/modules/ /opt/jboss/modules/
 
-# TODO don't know if we need this actually
+# Add custom inifinispan jdbc-string store key mapper module
+RUN mkdir -p ${JBOSS_HOME}/modules/de/coliquio/keycloak/main
+COPY module/extended-keymapper.jar ${JBOSS_HOME}/modules/de/coliquio/keycloak/main/extended-keymapper.jar
+COPY configuration/infinispan-module.xml ${JBOSS_HOME}/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/module.xml
+COPY configuration/extended-keymapper-module.xml ${JBOSS_HOME}/modules/de/coliquio/keycloak/main/module.xml
 COPY configuration/jgroups-module.xml ${JBOSS_HOME}/modules/system/layers/base/org/jgroups/main/module.xml
 
 # add customized tools (docker-entrypoint.sh and jgroups configuration cli)
