@@ -2,7 +2,11 @@
 
 Note: this demonstrates issues persisting sessions using Keycloak Infinispan JDBC Store
 
-## Start the cluster
+## Sandbox Environment
+
+Requirements: docker and docker-compose are installed
+
+### Start the cluster
 
 ```bash
 # just start
@@ -12,9 +16,9 @@ docker-compose -f docker-compose.yml -f docker-compose.ports.yml up
 docker-compose down && docker-compose -f docker-compose.yml -f docker-compose.ports.yml up --build
 ```
 
-## Create Sessions
+### Create Sessions
 
-### Cluster
+#### Cluster
 
 ```bash
 open http://localhost:8000/auth/realms/example/account
@@ -23,7 +27,7 @@ open http://localhost:8000/auth/realms/example/account
 # Password `admin`
 ```
 
-### Single Node
+#### Single Node
 
 ```bash
 open http://localhost:8081/auth/realms/example/account
