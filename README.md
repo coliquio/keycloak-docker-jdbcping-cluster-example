@@ -34,14 +34,26 @@ open http://localhost:8081/auth/realms/example/account
 # => works, the "Edit Account" view is shown
 ```
 
-### Stopping/starting nodes and testing session aliveness
+### Problem
+
+#### Expectation
+
+Keycloak cluster nodes should persist all sessions in the JDBC mysql database, because the caches are configured like that [./startup-scripts/cache_owners.cli](./startup-scripts/cache_owners.cli)
+
+So after stopping and restarting all cluster nodes, the expectation is that Keycloak nodes get their sessions again from the mysql database.
+
+#### Observation
+
+After stopping all cluster nodes and restarting them, all sessions are gone.
+
+#### Steps to reproduce
 
 1. Stop instance 1 `docker stop keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_1`
-2. Check in browser if you are still logged in -> works, because sessions are spread in cluster memory (CORRECT)
+2. Check in browser if you are still logged in -> works, because sessions are spread in cluster memory (**CORRECT**)
 3. Stop instance 2 `docker stop keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_2`
 4. Of course, now no web UI is available
-5. Start instance 1 again `docker start keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_1`
-6. Check in browser if you are still logged in -> works, because sessions were not persisted in mysql db (WRONG)
+5. Start instance 1 again `docker start keycloak-docker-jdbcping-cluster-example_mysql_jdbcping_1` (wait some minute to until it comes up again)
+6. Check in browser if you are still logged in -> works, because sessions were not persisted in mysql db (**WRONG**)
 
 ## Analyse Internals
 
